@@ -1,0 +1,124 @@
+#!/bin/sh
+
+me=poc/main
+while :
+do
+    case $# in
+	0) break
+	   ;;
+	*) case "$1" in
+	       -n) shift
+		   case $# in
+			0) printf %s\\n "$me: -n needs an argument"
+			   exit 2
+			   ;;
+		   esac
+		   n=$1
+		   ;;
+	       -*) printf %s\\n "$me: unknown option '$1'"
+		   exit 2
+		   ;;
+	       *) printf %s\\n "$me: unknown argument '$1'"
+		  ;;
+	   esac
+	   ;;
+    esac
+    shift
+done
+
+case "$n" in
+    '') printf %s\\n "$me: -n is not set"
+	exit 2
+	;;
+esac
+
+"${AWK=awk}" -v N="$n" '
+BEGIN {
+    pi = 3.141592653589793
+    coef()
+    printf "sum_sq: %.16g %.16g\n", sq_f(), sq_g() | "cat >&2"
+    write()
+}
+
+function f(x,   L) {
+    L = 2*N
+    return x/L
+    #return abs(sin(2*pi*x/L))
+    #return x < L/2 ? x : L - x
+    #return x * (L - x)
+    #return sqrt(x) * (L - x)
+    #return x < L/4 ? 0 : x < 3*L/4 ? 1 : 0
+    #return sinc(12*pi*(x/L - 1/2))
+    #return bump(3*(x/L - 1/2))
+}
+
+function write(   lo, hi, n, x, i) {
+    lo = 0
+    hi = 2 * N
+    n = 10 * 2 * N
+    for (i = 0; i < n; i++) {
+	x = lo + i*(hi - lo)/n
+	print x, f(x), g(x)
+    }
+}
+
+function coef(   m, x, F, C) {
+    for (x = 1; x <= 2 * N - 1; x++)
+	F[x] = f(x)
+
+    for (m = 1; m <= N - 1; m++) {
+	for (x = 0; x <= 2*N - 1; x++) {
+	    a[m] += F[x] * cos(pi/N*m*x)
+	    b[m] += F[x] * sin(pi/N*m*x)
+	}
+	a[m] /= N
+	b[m] /= N
+    }
+    for (x = 0; x <= 2*N - 1; x++) {
+	a[0] += F[x]
+	a[N] += F[x] * cos(pi*x)
+    }
+    a[0] /= N
+    a[N] /= N
+}
+
+function g(x,   s, m) {
+    s = a[0]/2
+    for (m = 1; m <= N - 1; m++) {
+	s += a[m] * cos(pi/N*m*x)
+	s += b[m] * sin(pi/N*m*x)
+    }
+    s += a[N]/2 * cos(pi*x)
+    return s
+}
+
+function sq_f(   x, s) {
+    for (x = 0; x <= 2*N - 1; x++) {
+	s += f(x)^2
+    }
+    return s
+}
+
+function sq_g(   k, s) {
+    s = a[0]^2/2
+    for (k = 1; k <= N - 1; k++) {
+	s += a[k]^2
+	s += b[k]^2
+    }
+    s += a[N]^2/2
+    return s * N
+}
+
+function abs(x) {
+    return x > 0 ? x : -x
+}
+
+function sinc(x) {
+    eps = 1e-6
+    return abs(x) < eps ? 1 - x^2/6 + x^4/120 : sin(x)/x
+}
+
+function bump(x) {
+    return abs(x) < 1 ? exp(-1/(1 - x^2)) : 0
+}
+'
