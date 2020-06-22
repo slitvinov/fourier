@@ -16,7 +16,7 @@ TRAINING SET IMAGE FILE (train-images-idx3-ubyte):
 0004     32 bit integer  60000            number of images
 0008     32 bit integer  28               number of rows
 0012     32 bit integer  28               number of columns
-m0016     unsigned byte   ??               pixel
+0016     unsigned byte   ??               pixel
 0017     unsigned byte   ??               pixel
 ........
 xxxx     unsigned byte   ??               pixel

@@ -142,7 +142,6 @@ main(int argc, char **argv)
         fprintf(stderr, "%s: fail to write to stdout\n", me);
         exit(2);
     }
-
     free(data);
     if (fclose(input_file) != 0) {
         fprintf(stderr, "%s: fail to close '%s'\n", me, input_path);
