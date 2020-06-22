@@ -1,12 +1,21 @@
 #!/bin/sh
 
 me=poc/main
+usg () {
+    cat >&2 <<!
+$me -n int
+!
+    exit
+}
+
 while :
 do
     case $# in
 	0) break
 	   ;;
 	*) case "$1" in
+	       -h ) usg
+		    ;;
 	       -n) shift
 		   case $# in
 			0) printf %s\\n "$me: -n needs an argument"
