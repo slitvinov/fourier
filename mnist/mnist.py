@@ -62,7 +62,7 @@ a = images(train_images)
 l = labels(train_labels)
 b = to(a)
 
-reg = sklearn.linear_model.LogisticRegression(solver = 'lbfgs', max_iter=10000)
+reg = sklearn.linear_model.LogisticRegression(solver = 'lbfgs', verbose=1, n_jobs=4, max_iter=1000)
 reg.fit(b, l)
 print(reg.score(b, l))
 

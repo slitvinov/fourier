@@ -11,30 +11,34 @@ static uint32_t to_int32b(uint32_t, uint32_t, uint32_t, uint32_t);
 static void
 usg(void)
 {
-    fprintf(stderr, "%s -s int -i file.idx3\n", me);
+    fprintf(stderr, "%s [-s int|-a] -i file.idx3\n", me);
     exit(2);
 }
 
 #define	USED(x)		if(x);else{}
+
 int
 main(int argc, char **argv)
 {
+    enum {OUTPUT_ALL = 1, OUTPUT_ONE = 2};
     const char *input_path;
     FILE *input_file;
     int Iflag;
-    int Sflag;
     int Verbose;
     size_t pos;
     size_t size;
+    uint32_t i;
     uint32_t magic;
     uint32_t n_items;
     uint32_t s;
     unsigned char bytes[4];
     unsigned char label;
+    unsigned char *labels;
+    int Output;
 
     USED(argc);
     Iflag = 0;
-    Sflag = 0;
+    Output = 0;
     Verbose = 0;
     while (*++argv != NULL && argv[0][0] == '-')
         switch (argv[0][1]) {
@@ -53,6 +57,9 @@ main(int argc, char **argv)
             input_path = *argv;
             Iflag = 1;
             break;
+        case 'a':
+            Output = OUTPUT_ALL;
+            break;
         case 's':
             argv++;
             if (argv[0] == NULL) {
@@ -60,20 +67,21 @@ main(int argc, char **argv)
                 exit(2);
             }
             s = atoi(*argv);
-            Sflag = 1;
+            Output = OUTPUT_ONE;
             break;
         default:
             fprintf(stderr, "%s: unknown option '%s'\n", me, argv[0]);
             exit(1);
         }
-    if (Sflag == 0) {
-        fprintf(stderr, "%s: -s is not set\n", me);
+    if (Output == 0) {
+        fprintf(stderr, "%s: -s or -a must be set\n", me);
         exit(2);
     }
     if (Iflag == 0) {
         fprintf(stderr, "%s: -i is not set\n", me);
         exit(2);
     }
+    
     if ((input_file = fopen(input_path, "r")) == NULL) {
         fprintf(stderr, "%s: fail to read '%s'\n", me, input_path);
         exit(2);
@@ -106,21 +114,39 @@ main(int argc, char **argv)
         fprintf(stderr, "%s: n_items: %d >= %d\n", me, s, n_items);
         exit(2);
     }
-    if (fseek(input_file, s, SEEK_CUR) != 0) {
-        fprintf(stderr, "%s:%d: fseek failed\n", __FILE__, __LINE__);
-        exit(2);
-    }
-    if (fread(&label, sizeof *bytes, 1, input_file) != 1) {
-        fprintf(stderr, "%s: fail to read '%s'\n", me, input_path);
-        exit(2);
-    }
     if (Verbose)
-        fprintf(stderr, "%d", n_items);
-    printf("%d\n", label);
+            fprintf(stderr, "%d", n_items);
+    switch (Output) {
+    case OUTPUT_ONE:
+        if (fseek(input_file, s, SEEK_CUR) != 0) {
+            fprintf(stderr, "%s:%d: fseek failed\n", __FILE__, __LINE__);
+            exit(2);
+        }
+        if (fread(&label, sizeof *bytes, 1, input_file) != 1) {
+            fprintf(stderr, "%s: fail to read '%s'\n", me, input_path);
+            exit(2);
+        }
+        printf("%d\n", label);
+        break;
+    case OUTPUT_ALL:
+        if ((labels = malloc(n_items* sizeof *labels)) == NULL) {
+            fprintf(stderr, "%s: malloc failed\n", me);
+            exit(2);
+        }
+        if (fread(labels, sizeof *bytes, n_items, input_file) != n_items) {
+            fprintf(stderr, "%s: fail to read '%s'\n", me, input_path);
+            exit(2);
+        }
+        for (i = 0; i < n_items; i++)
+            printf("%d\n", labels[i]);
+        free(labels);
+        break;
+    }
     if (fclose(input_file) != 0) {
         fprintf(stderr, "%s: fail to close '%s'\n", me, input_path);
         exit(2);
     }
+    return 0;
 }
 
 static size_t
