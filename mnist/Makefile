@@ -7,6 +7,7 @@ CFLAGS = -Ofast -g
 LINK = $(CC)
 M = \
 pgm\
+label\
 
 all: $M
 .o:; $(LINK) $< $(LDFLAGS) -o $@

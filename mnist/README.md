@@ -21,3 +21,13 @@ m0016     unsigned byte   ??               pixel
 ........
 xxxx     unsigned byte   ??               pixel
 ~~~
+
+~~~
+[offset] [type]          [value]          [description]
+0000     32 bit integer  0x00000801(2049) magic number (MSB first)
+0004     32 bit integer  10000            number of items
+0008     unsigned byte   ??               label
+0009     unsigned byte   ??               label
+........
+xxxx     unsigned byte   ??               label
+~~~
