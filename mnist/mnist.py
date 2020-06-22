@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 
-import sys
 import numpy
+import scipy
+import sys
 me = "mnist"
 images_path = "train.images.idx3"
 labels_path = "train.labels.idx1"
@@ -43,7 +44,14 @@ def pgm(path, s):
 
 a = images(images_path)
 l = labels(labels_path)
+s = a[1]
 
-i = 56
-pgm("a.pgm", a[i])
-print(l[i])
+f = scipy.fft.fft2(s)
+n = a.shape[1]
+print(numpy.real(f[0,0]))
+
+s0 = scipy.fft.ifft2(f)
+s0 = numpy.real(s0)
+s0 = numpy.asarray(s0, dtype = "u1")
+pgm("s0.pgm", s0)
+pgm("s.pgm", s)
