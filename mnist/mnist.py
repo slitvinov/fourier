@@ -3,7 +3,7 @@
 import numpy
 import scipy
 import sys
-from sklearn.linear_model import LogisticRegression
+import sklearn.linear_model
 
 me = "mnist"
 train_images = "train.images.idx3"
@@ -45,17 +45,27 @@ def pgm(path, s):
         file.write("%d\n" % 0xFF)
         s.tofile(file)
 
+def to(a):
+    n = a.shape[0]
+    b = []
+    for i in range(n):
+        f = scipy.fft.fft2(a[i])
+        f = numpy.array((f.real, f.imag))
+        f = f.ravel()
+        b.append(f[:40])
+        if i % 10000 == 0:
+            sys.stderr.write("%s: %05d/%05d\n" % (me, i, n))
+    return b
+
 a = images(train_images)
 l = labels(train_labels)
+b = to(a)
 
-reg = LogisticRegression(solver = 'lbfgs')
-b = a.reshape(a.shape[0], a.shape[1] * a.shape[2])
+reg = sklearn.linear_model.LogisticRegression(solver = 'lbfgs', max_iter=1000)
 reg.fit(b, l)
 print(reg.score(b, l))
 
 a0 = images(test_images)
 l0 = labels(test_labels)
-b0 = a0.reshape(a0.shape[0], a0.shape[1] * a0.shape[2])
+b0 = to(a0)
 print(reg.score(b0, l0))
-
-
