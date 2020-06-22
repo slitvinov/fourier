@@ -8,37 +8,31 @@ def ft(f):
     n = f.size
     assert n % 2 == 0
     N = n // 2
-    a = numpy.empty_like(f)
-    b = numpy.empty_like(f)
+    a = numpy.zeros_like(f)
+    b = numpy.zeros_like(f)
     for m in range(2 * N):
-        a[m] = 0
-        b[m] = 0
         for x in range(2 * N):
             om = numpy.pi/N*m*x
             a[m] += f[x] * math.cos(om)
             b[m] += f[x] * math.sin(om)
     return a, b
 
-def ift(f):
+def ift(a, b):
     n = f.size
     assert n % 2 == 0
     N = n // 2
-    a = numpy.empty_like(f)
-    b = numpy.empty_like(f)
+    y = numpy.zeros_like(f)
     for m in range(2 * N):
-        a[m] = 0
-        b[m] = 0
         for x in range(2 * N):
             om = numpy.pi/N*m*x
-            a[m] += f[x] * math.cos(om)
-            b[m] += f[x] * math.sin(om)
-    return a/n, b/n
+            y[x] += a[m] * math.cos(om)
+            y[x] += b[m] * math.sin(om)
+    return y/n
 
 a, b = ft(f)
 y = a - 1j * b
 
-a, b = ift(y)
-f0 = a + 1j * b
+f0 = ift(a, b)
 
 print(numpy.allclose(scipy.fftpack.ifft(y), f0))
 print(numpy.allclose(f, f0))
