@@ -2,6 +2,7 @@
 
 import numpy
 import scipy
+import scipy.fftpack
 import sys
 import sklearn.linear_model
 
@@ -49,7 +50,7 @@ def to(a):
     n = a.shape[0]
     b = []
     for i in range(n):
-        f = scipy.fft.fft2(a[i])
+        f = scipy.fftpack.fft2(a[i])
         f = numpy.array((f.real, f.imag))
         f = f.ravel()
         b.append(f)
