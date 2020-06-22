@@ -11,7 +11,7 @@ static uint32_t to_int32b(uint32_t, uint32_t, uint32_t, uint32_t);
 static void
 usg(void)
 {
-    fprintf(stderr, "%s -s int -i file.idx3 > file.ggm", me);
+    fprintf(stderr, "%s -s int -i file.idx3 > file.pgm\n", me);
     exit(2);
 }
 
@@ -133,7 +133,7 @@ main(int argc, char **argv)
     if (Verbose)
         fprintf(stderr, "%d %d %d\n", n_images, n_rows, n_columns);
     fprintf(stdout, "P5\n");
-    fprintf(stdout, "%ld %ld\n", n_rows, n_columns);
+    fprintf(stdout, "%d %d\n", n_rows, n_columns);
     fprintf(stdout, "%d\n", 0xFF);
     if (fwrite(data, sizeof *data, n_rows * n_columns, stdout) != n_columns * n_rows) {
         fprintf(stderr, "%s: fail to write to stdout\n", me);
