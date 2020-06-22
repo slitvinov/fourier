@@ -34,14 +34,16 @@ def labels(path):
             sys.exit(2)
     return a
 
+def pgm(path, s):
+    with open(path, "w") as file:
+        file.write("P5\n")
+        file.write("%d %d\n" % s.shape)
+        file.write("%d\n" % 0xFF)
+        s.tofile(file)
+
 a = images(images_path)
 l = labels(labels_path)
-print(l)
-sys.exit(0)
 
-s = a[56]
-with open("a.pgm", "w") as file:
-    file.write("P5\n")
-    file.write("%d %d\n" % s.shape)
-    file.write("%d\n" % 0xFF)
-    s.tofile(file)
+i = 56
+pgm("a.pgm", a[i])
+print(l[i])
