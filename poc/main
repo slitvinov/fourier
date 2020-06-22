@@ -8,6 +8,7 @@ $me -n int
     exit
 }
 
+Lanczos=0
 while :
 do
     case $# in
@@ -16,6 +17,8 @@ do
 	*) case "$1" in
 	       -h ) usg
 		    ;;
+	       -l) Lanczos=1
+		   ;;
 	       -n) shift
 		   case $# in
 			0) printf %s\\n "$me: -n needs an argument"
@@ -41,22 +44,24 @@ case "$n" in
 	;;
 esac
 
-"${AWK=awk}" -v N="$n" '
+"${AWK=awk}" -v N="$n" -v Lanczos=$Lanczos '
 BEGIN {
     pi = 3.141592653589793
     coef()
+    if (Lanczos)
+	lanczos()
     printf "sum_sq: %.16g %.16g\n", sq_f(), sq_g() | "cat >&2"
     write()
 }
 
 function f(x,   L) {
     L = 2*N
-    return x/L
+    #return x/L
     #return abs(sin(2*pi*x/L))
     #return x < L/2 ? x : L - x
     #return x * (L - x)
     #return sqrt(x) * (L - x)
-    #return x < L/4 ? 0 : x < 3*L/4 ? 1 : 0
+    return x < L/4 ? 0 : x < 3*L/4 ? 1 : 0
     #return sinc(12*pi*(x/L - 1/2))
     #return bump(3*(x/L - 1/2))
 }
@@ -89,6 +94,14 @@ function coef(   m, x, F, C) {
     }
     a[0] /= N
     a[N] /= N
+}
+
+function lanczos(   m, sigma) {
+    for (m = 1; m <= N; m++) {
+	sigma = sin(pi * m / N) / (pi * m / N)
+	a[m] *= sigma
+	b[m] *= sigma
+    }
 }
 
 function g(x,   s, m) {
