@@ -23,6 +23,7 @@ main(int argc, char **argv)
     FILE *input_file;
     int Iflag;
     int Sflag;
+    int Verbose;
     size_t pos;
     size_t size;
     uint32_t magic;
@@ -36,10 +37,14 @@ main(int argc, char **argv)
     USED(argc);
     Iflag = 0;
     Sflag = 0;
+    Verbose = 0;
     while (*++argv != NULL && argv[0][0] == '-')
         switch (argv[0][1]) {
         case 'h':
             usg();
+            break;
+        case 'v':
+            Verbose = 1;
             break;
         case 'i':
             argv++;
@@ -125,8 +130,15 @@ main(int argc, char **argv)
         fprintf(stderr, "%s: fail to read '%s'\n", me, input_path);
         exit(2);
     }
-
-    
+    if (Verbose)
+        fprintf(stderr, "%d %d %d\n", n_images, n_rows, n_columns);
+    fprintf(stdout, "P5\n");
+    fprintf(stdout, "%ld %ld\n", n_rows, n_columns);
+    fprintf(stdout, "%d\n", 0xFF);
+    if (fwrite(data, sizeof *data, n_rows * n_columns, stdout) != n_columns * n_rows) {
+        fprintf(stderr, "%s: fail to write to stdout\n", me);
+        exit(2);
+    }
 
     free(data);
     if (fclose(input_file) != 0) {

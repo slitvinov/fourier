@@ -2,7 +2,7 @@
 .SUFFIXES: .c .o
 .PHONY: all install clean
 
-CFLAGS = -O3 -g
+CFLAGS = -Ofast -g
 
 LINK = $(CC)
 M = \
