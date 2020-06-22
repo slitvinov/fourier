@@ -52,7 +52,7 @@ def to(a):
         f = scipy.fft.fft2(a[i])
         f = numpy.array((f.real, f.imag))
         f = f.ravel()
-        b.append(f[:40])
+        b.append(f)
         if i % 10000 == 0:
             sys.stderr.write("%s: %05d/%05d\n" % (me, i, n))
     return b
@@ -61,7 +61,7 @@ a = images(train_images)
 l = labels(train_labels)
 b = to(a)
 
-reg = sklearn.linear_model.LogisticRegression(solver = 'lbfgs', max_iter=1000)
+reg = sklearn.linear_model.LogisticRegression(solver = 'lbfgs', max_iter=10000)
 reg.fit(b, l)
 print(reg.score(b, l))
 
