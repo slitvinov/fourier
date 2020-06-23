@@ -3,11 +3,12 @@
 me=poc/main
 usg () {
     cat >&2 <<!
-$me -n int
+$me -n int -o coeff|xy
 !
     exit
 }
 
+: ${OutputFmt=%.16e %s%03d}
 Lanczos=0
 while :
 do
@@ -18,6 +19,22 @@ do
 	       -h ) usg
 		    ;;
 	       -l) Lanczos=1
+		   ;;
+	       -o) shift
+		   case $# in
+			0) printf %s\\n "$me: -o needs an argument"
+			   exit 2
+			   ;;
+		   esac
+		   case "$1" in
+		       x*) Output=xy
+			   ;;
+		       c*) Output=coeff
+			   ;;
+		       *) printf %s\\n "$me: unknown output type '$1'"
+			  exit 2
+			  ;;
+		   esac
 		   ;;
 	       -n) shift
 		   case $# in
@@ -44,14 +61,26 @@ case "$n" in
 	;;
 esac
 
-"${AWK=awk}" -v N="$n" -v Lanczos=$Lanczos '
+case "$Output" in
+    '') printf %s\\n "$me: -o is not set"
+	exit 2
+	;;
+esac
+
+"${AWK=awk}" -v N="$n" \
+-v Lanczos=$Lanczos \
+-v Output=$Output \
+-v OutputFmt="$OutputFmt" \
+'
 BEGIN {
     pi = 3.141592653589793
-    coef()
+    coeff()
     if (Lanczos)
 	lanczos()
-    #printf "sum_sq: %.16g %.16g\n", sq_f(), sq_g() | "cat >&2"
-    write()
+    if (Output == "xy")
+	output_xy()
+    else if (Output == "coeff")
+	output_coeff()
 }
 
 function f(x,   L) {
@@ -66,7 +95,7 @@ function f(x,   L) {
     #return bump(3*(x/L - 1/2))
 }
 
-function write(   lo, hi, n, x, i) {
+function output_xy(   lo, hi, n, x, i) {
     lo = 0
     hi = 2 * N
     n = 10 * 2 * N
@@ -76,7 +105,17 @@ function write(   lo, hi, n, x, i) {
     }
 }
 
-function coef(   m, x, F, C) {
+function output_coeff(   m, fmt) {
+    fmt = OutputFmt "\n"
+    printf fmt, a[0], "a", 0
+    for (m = 1; m <= N - 1; m++) {
+	printf fmt, a[m], "a", m
+	printf fmt, b[m], "b", m
+    }
+    printf fmt, a[N], "a", N
+}
+
+function coeff(   m, x, F, C) {
     for (x = 1; x <= 2 * N - 1; x++)
 	F[x] = f(x)
     for (m = 0; m <= N; m++) {
