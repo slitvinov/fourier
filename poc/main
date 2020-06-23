@@ -79,21 +79,16 @@ function write(   lo, hi, n, x, i) {
 function coef(   m, x, F, C) {
     for (x = 1; x <= 2 * N - 1; x++)
 	F[x] = f(x)
-
-    for (m = 1; m <= N - 1; m++) {
-	for (x = 0; x <= 2*N - 1; x++) {
+    for (m = 0; m <= N; m++) {
+	for (x = 0; x <= 2*N - 1; x++)
 	    a[m] += F[x] * cos(pi/N*m*x)
-	    b[m] += F[x] * sin(pi/N*m*x)
-	}
 	a[m] /= N
+    }
+    for (m = 1; m <= N - 1; m++) {
+	for (x = 0; x <= 2*N - 1; x++)
+	    b[m] += F[x] * sin(pi/N*m*x)
 	b[m] /= N
     }
-    for (x = 0; x <= 2*N - 1; x++) {
-	a[0] += F[x]
-	a[N] += F[x] * cos(pi*x)
-    }
-    a[0] /= N
-    a[N] /= N
 }
 
 function lanczos(   m, sigma) {

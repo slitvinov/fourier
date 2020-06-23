@@ -2,7 +2,7 @@ import scipy.fftpack
 import numpy
 import math
 
-f = numpy.random.random(12)
+f = numpy.random.random(100)
 g = scipy.fftpack.fft(f)
 def ft(f):
     n = f.size
@@ -34,5 +34,5 @@ y = a - 1j * b
 
 f0 = ift(a, b)
 
-print(numpy.allclose(scipy.fftpack.ifft(y), f0))
+#print(numpy.allclose(scipy.fftpack.ifft(y), f0))
 print(numpy.allclose(f, f0))
