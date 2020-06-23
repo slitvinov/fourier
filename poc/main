@@ -50,7 +50,7 @@ BEGIN {
     coef()
     if (Lanczos)
 	lanczos()
-    printf "sum_sq: %.16g %.16g\n", sq_f(), sq_g() | "cat >&2"
+    #printf "sum_sq: %.16g %.16g\n", sq_f(), sq_g() | "cat >&2"
     write()
 }
 
