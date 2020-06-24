@@ -8,7 +8,7 @@ $me -n int -o coeff|xy
     exit
 }
 
-: ${OutputFmt=%.16e %s%03d}
+: ${OutputFmt=%+.16e %s%03d}
 Lanczos=0
 while :
 do
@@ -85,12 +85,13 @@ BEGIN {
 
 function f(x,   L) {
     L = 2*N
+    #return 1
     #return x/L
     #return abs(sin(2*pi*x/L))
     #return x < L/2 ? x : L - x
     #return x * (L - x)
-    #return sqrt(x) * (L - x)
-    return x < L/4 ? 0 : x < 3*L/4 ? 1 : 0
+    return sqrt(x) * (L - x)
+    #return x < L/4 ? 0 : x < 3*L/4 ? 1 : 0
     #return sinc(12*pi*(x/L - 1/2))
     #return bump(3*(x/L - 1/2))
 }
@@ -116,7 +117,7 @@ function output_coeff(   m, fmt) {
 }
 
 function coeff(   m, x, F, C) {
-    for (x = 1; x <= 2 * N - 1; x++)
+    for (x = 0; x <= 2 * N - 1; x++)
 	F[x] = f(x)
     for (m = 0; m <= N; m++) {
 	for (x = 0; x <= 2*N - 1; x++)

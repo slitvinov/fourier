@@ -1,11 +1,11 @@
-N: 3;
+N: 5;
 sk(e):=sum(e, k, 1, N - 1);
 sx(e):=sum(e, x, 0, 2 * N - 1);
 f(x):=a[0]/2 + sk(a[k]*cos(%pi/N*k*x) + b[k]*sin(%pi/N*k*x)) + a[N]/2*cos(%pi*x);
 
-sx(f(x) * cos(%pi/N*m*x))/N, expand; /* m in [0, N] */
-sx(f(x) * sin(%pi/N*m*x))/N, expand; /* m in [1, N-1] */
+g(x):= sqrt(x) * (2*N - x);
+for m: 0 thru N do a[m]: float(sx(g(x) * cos(%pi/N*m*x))/N);
+for m: 1 thru N - 1 do b[m]: float(sx(g(x) * sin(%pi/N*m*x))/N);
 
-g(x):= x;
-for m: 0 thru N do
-print(float(sx(g(x) * sin(%pi/N*m*x))/N));
+for m: 0 thru N do print(float(a[m]));
+for m: 1 thru N - 1 do print(float(b[m]));
