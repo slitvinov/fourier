@@ -2,6 +2,7 @@
 
 import numpy
 import sys
+import sklearn.linear_model
 
 me = "mnist"
 train_images = "train.images.idx3"
@@ -37,12 +38,33 @@ def labels(path):
             sys.exit(2)
     return a
 def pgm(path, s):
-    s = numpy.asarray(s)
-    if s.dtype != numpy.uint8:
-        sys.stderr.write("%s: wrong dtype = '%s'\n" % (me, s.dtype))
-        sys.exit(2)
     with open(path, "w") as file:
         file.write("P5\n")
         file.write("%d %d\n" % s.shape)
         file.write("%d\n" % 0xFF)
         s.tofile(file)
+
+def to(a):
+    n = a.shape[0]
+    b = []
+    for i in range(n):
+        f = numpy.fft.rfft2(a[i])
+        f = numpy.array((f.real, f.imag))
+        f = f.ravel()
+        b.append(f)
+        if i % 10000 == 0:
+            sys.stderr.write("%s: %05d/%05d\n" % (me, i, n))
+    return b
+
+a = images(train_images)
+l = labels(train_labels)
+b = to(a)
+
+reg = sklearn.linear_model.LogisticRegression(solver = 'lbfgs', verbose=1, n_jobs=4, max_iter=1000)
+reg.fit(b, l)
+print(reg.score(b, l))
+
+a0 = images(test_images)
+l0 = labels(test_labels)
+b0 = to(a0)
+print(reg.score(b0, l0))

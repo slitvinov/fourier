@@ -3,7 +3,7 @@
 me=poc/main
 usg () {
     cat >&2 <<!
-$me -n int -o coeff|xy
+$me [-l] -n int -o coeff|xy
 !
     exit
 }
