@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import numpy
+import math
 
 def ft(f, axis = -1):
     f = numpy.asarray(f)
@@ -28,3 +29,22 @@ def ift(a, b, axis = -1):
     g.real = a
     g.imag[index] = -b
     return N * numpy.fft.irfft(g, axis=axis)
+
+def lanczos(a, b, axis = -1):
+    N = a.shape[axis] - 1
+    if b.shape[axis] != N - 1:
+        raise RuntimeError("wrong dimensions for a and b")
+    m = numpy.arange(1, N)
+    sigma = numpy.sin(math.pi * m / N) / (math.pi * m / N)
+
+    index = [None] * a.ndim
+    index[axis] = slice(None)
+    index = tuple(index)
+
+    sigma = sigma[index]
+    b *= sigma
+
+    index = [slice(None)] * a.ndim
+    index[axis] = slice(1, -1)
+    index = tuple(index)
+    a[index] *= sigma

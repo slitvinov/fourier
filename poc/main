@@ -132,7 +132,7 @@ function coeff(   m, x, F, C) {
 }
 
 function lanczos(   m, sigma) {
-    for (m = 1; m <= N; m++) {
+    for (m = 1; m <= N - 1; m++) {
 	sigma = sin(pi * m / N) / (pi * m / N)
 	a[m] *= sigma
 	b[m] *= sigma
