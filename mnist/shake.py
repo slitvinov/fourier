@@ -4,8 +4,8 @@ import sys
 import mnist
 import ft
 
-a = mnist.images(mnist.test_images)
-f = a[1]
+a = mnist.images(mnist.train_images)
+f = a[0]
 
 a, b = ft.ft(f, axis = 0)
 aa, ab = ft.ft(a, axis = 1)

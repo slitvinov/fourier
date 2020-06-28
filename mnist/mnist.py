@@ -43,6 +43,6 @@ def pgm(path, s):
         sys.exit(2)
     with open(path, "w") as file:
         file.write("P5\n")
-        file.write("%d %d\n" % s.shape)
+        file.write("%d %d\n" % (s.shape[1], s.shape[0]))
         file.write("%d\n" % 0xFF)
         s.tofile(file)
